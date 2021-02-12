@@ -24,3 +24,9 @@ Pandos Phase 3 files:
 -------------------------
 Phase3Makefile: sample makefile for use in Phase 3 (rename as Makefile)
 testPrograms subdirectory - which contains its own README file.
+
+
+
+Compile command (d flag is for additional debugging):
+
+>>	make --file=Phase1Makefile (-d)
