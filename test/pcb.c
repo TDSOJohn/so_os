@@ -1,9 +1,8 @@
-#include <stdio.h>
-#include "pandos_const.h"
-#include "pandos_types.h"
+#include "../h/pcb.h"
+
 
 /*static pcb_t pcb_table[MAXPROC]; Tabella dei PCB*/
-pcb_t *pcbfree_h = NULL;
+
 /*struct pcb_t pcbactive;*/
 
 void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem){
@@ -11,24 +10,21 @@ void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem){
         /*Caso empty*/
         *pcblist_p = pcb_elem;
         pcb_elem->p_next = NULL;
-        printf("Primo if\n");
         return;
     }
     else if ((*pcblist_p)->p_next == NULL) {
         /*Inserimento*/
         (*pcblist_p)->p_next = pcb_elem;
         pcb_elem->p_next = NULL;
-        printf("Altri if\n");
     }
     else insertPCBList(&((*pcblist_p)->p_next), pcb_elem);
 }
 
 void initPcbs(void){
     static pcb_t pcb_table[MAXPROC]; /*Tabella dei PCB*/
-    //static pcb_t *pcbfree_h = NULL;
+    /*static pcb_t *pcbfree_h = NULL;*/
     for (int i = 0; i < MAXPROC; ++i) {
         insertPCBList(&pcbfree_h, &pcb_table[i]);
-        printf("i = %d\n", i);
     }
 }
 
@@ -57,4 +53,42 @@ pcb_t *allocPcb() {
 
         return ptmp;
     }
+}
+
+pcb_t* mkEmptyProcQ(){
+    struct pcb_t* tmp = NULL;
+    return tmp;
+}
+
+int emptyProcQ(pcb_t *tp){
+    return tp == NULL;
+}
+
+void insertProcQ(pcb_t **tp, pcb_t* p){
+    if ((*tp) == NULL) {(*tp) = p;}
+    else {
+        /*Pointer points to last Node*/
+        pcb_t *last = (*tp)->p_prev;
+
+        pcb_t *tmp = p;
+        /*struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+        new_node->data = value; /*Inserting the data*/
+
+        /* setting up previous and next of new node*/
+        tmp->p_next = *tp;
+        tmp->p_prev = last;
+
+        /* Update next and previous pointers of start
+        and last.*/
+        last->p_next = (*tp)->p_prev = tmp;
+
+        /* Update start pointer*/
+        *tp = tmp;
+    }
+
+}
+
+pcb_t *headProcQ(pcb_t **tp){
+    if (*tp == NULL) {return NULL;}
+    else return *tp;
 }

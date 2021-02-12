@@ -12,6 +12,8 @@
  *      Modified by Michael Goldweber on May 2020
  */
 
+#include <stdio.h>
+
 #include "../h/const.h"
 #include "../h/types.h"
 
