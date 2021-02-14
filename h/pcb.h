@@ -17,8 +17,6 @@ typedef struct pcb_t
 } pcb_t, *pcb_PTR;
 
 
-pcb_t *pcbfree_h = NULL;
-
 void    initPcbs(void);
 void    insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem);
 void    freePcb(pcb_t *p);
