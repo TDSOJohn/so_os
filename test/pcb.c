@@ -72,27 +72,24 @@ int emptyProcQ(pcb_t *tp){
 }
 
 void insertProcQ(pcb_t **tp, pcb_t* p){
-    if ((*tp) == NULL) {(*tp) = p;}
-    else {
-        /*// Pointer points to last Node*/
-        pcb_t *last = (*tp)->p_prev;
+    if ((*tp) == NULL) {
+       (*tp) = p;
+       p->p_next = p->p_prev = p;
+       *tp = p;
+       return;
+   }
+   else {
+       pcb_t *last = (*tp)->p_prev;
 
-        pcb_t *tmp = p;
-/*        //struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
-        //new_node->data = value; // Inserting the data
+       pcb_t *tmp = p;
 
-        // setting up previous and next of new node*/
-        tmp->p_next = *tp;
-        tmp->p_prev = last;
+       tmp->p_next = *tp;
+       tmp->p_prev = last;
 
-        /*// Update next and previous pointers of start
-        // and last.*/
-        last->p_next = (*tp)->p_prev = tmp;
+       last->p_next = (*tp)->p_prev = tmp;
 
-        /*// Update start pointer*/
-        *tp = tmp;
-    }
-
+       *tp = tmp;
+   }
 }
 
 pcb_t* removeProcQ(pcb_t **tp)
@@ -152,7 +149,8 @@ struct pcb_t * deleteNodeOut(struct pcb_t** tp)
     }
 }
 
-pcb_t* outProcQ(pcb_t **tp, pcb_t* p){
+pcb_t* outProcQ(pcb_t **tp, pcb_t* p)
+{
     if (tp == NULL)
         return NULL;
 
@@ -164,7 +162,7 @@ pcb_t* outProcQ(pcb_t **tp, pcb_t* p){
 }
 
 
-pcb_t *headProcQ(pcb_t **tp){
-    if (*tp == NULL) return NULL;
-    else return *tp;
+pcb_t *headProcQ(pcb_t **tp)
+{
+    return (*tp)->p_prev;
 }

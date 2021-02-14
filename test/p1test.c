@@ -126,22 +126,21 @@ void adderrbuf(char *strp) {
 void main() {
 	int i;
 
-	for(i = 0; i < 10; i++)
-	{
-		addokbuf("ciao	\n");
-	}
-
-	/*freePcb(procp[i]);*/
 	initPcbs();
 	addokbuf("Initialized process control blocks   \n");
 
+	if(MAXPROC == 20)
+		addokbuf("No more than 20 proc\n");
+
 	/* Check allocProc */
-	for (i = 0; i < MAXPROC; i++) {
+	for (i = 0; i < MAXPROC; i++)
+	{
 		addokbuf("new entry		\n");
 		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL   ");
 	}
-	if (allocPcb() != NULL) {
+	if (allocPcb() != NULL)
+	{
 		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
 	addokbuf("allocPcb ok   \n");
@@ -206,8 +205,8 @@ void main() {
 	if (removeProcQ(&qa) != NULL)
 		adderrbuf("removeProcQ: removes too many entries   ");
 
-        if (!emptyProcQ(qa))
-                adderrbuf("emptyProcQ: unexpected FALSE   ");
+    if (!emptyProcQ(qa))
+            adderrbuf("emptyProcQ: unexpected FALSE   ");
 
 	addokbuf("insertProcQ, removeProcQ and emptyProcQ ok   \n");
 	addokbuf("process queues module ok      \n");
