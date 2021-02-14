@@ -156,10 +156,12 @@ void main() {
 	qa = NULL;
 	if (!emptyProcQ(qa)) adderrbuf("emptyProcQ: unexpected FALSE   ");
 	addokbuf("Inserting...   \n");
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 10; i++)
+	{
 		if ((q = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL while insert   ");
-		switch (i) {
+		switch (i)
+		{
 		case 0:
 			firstproc = q;
 			break;
@@ -195,7 +197,8 @@ void main() {
 
 	/* Check if removeProc and insertProc remove in the correct order */
 	addokbuf("Removing...   \n");
-	for (i = 0; i < 8; i++) {
+	for (i = 0; i < 8; i++)
+	{
 		if ((q = removeProcQ(&qa)) == NULL)
 			adderrbuf("removeProcQ: unexpected NULL   ");
 		freePcb(q);

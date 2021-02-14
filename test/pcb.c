@@ -164,5 +164,5 @@ pcb_t* outProcQ(pcb_t **tp, pcb_t* p)
 
 pcb_t *headProcQ(pcb_t **tp)
 {
-    return (*tp)->p_prev;
+    return (*tp);
 }
