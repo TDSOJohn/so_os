@@ -1,20 +1,8 @@
 #ifndef pcb_h
 #define pcb_h
 
-#include "const.h"
-#include "types.h"
-
-
-typedef struct pcb_t
-{
-    struct pcb_t    *p_next;
-    struct pcb_t    *p_prev;
-
-    struct pcb_t    *p_prnt,
-                    *p_child,
-                    *p_next_sib,
-                    *p_prev_sib;
-} pcb_t, *pcb_PTR;
+#include "pandos_const.h"
+#include "pandos_types.h"
 
 
 void    initPcbs(void);

@@ -12,13 +12,10 @@
  *      Modified by Michael Goldweber on May 2020
  */
 
-#include <stdio.h>
+#include "../h/pandos_const.h"
+#include "../h/pandos_types.h"
 
-#include "../h/const.h"
-#include "../h/types.h"
-
-/*	might need to change it to /usr/local	*/
-#include "/usr/include/umps3/umps/libumps.h"
+/*#include "/usr/include/umps3/umps/libumps.h"*/
 #include "../h/pcb.h"
 /*#include "../h/asl.h"*/
 
@@ -44,35 +41,116 @@ char *mp = okbuf;
 
 typedef unsigned int devreg;
 
+/* This function returns the terminal transmitter status value given its address */
+devreg termstat(memaddr * stataddr) {
+	return((*stataddr) & STATUSMASK);
+}
+
+/* This function prints a string on specified terminal and returns TRUE if
+ * print was successful, FALSE if not   */
+unsigned int termprint(char * str, unsigned int term) {
+	memaddr * statusp;
+	memaddr * commandp;
+	devreg stat;
+	devreg cmd;
+	unsigned int error = FALSE;
+
+	if (term < DEVPERINT) {
+		/* terminal is correct */
+		/* compute device register field addresses */
+		statusp = (devreg *) (TERM0ADDR + (term * DEVREGSIZE) + (TRANSTATUS * DEVREGLEN));
+		commandp = (devreg *) (TERM0ADDR + (term * DEVREGSIZE) + (TRANCOMMAND * DEVREGLEN));
+
+		/* test device status */
+		stat = termstat(statusp);
+		if (stat == READY || stat == TRANSMITTED) {
+			/* device is available */
+
+			/* print cycle */
+			while (*str != EOS && !error) {
+				cmd = (*str << CHAROFFSET) | PRINTCHR;
+				*commandp = cmd;
+
+				/* busy waiting */
+				stat = termstat(statusp);
+				while (stat == BUSY)
+					 stat = termstat(statusp);
+
+				/* end of wait */
+				if (stat != TRANSMITTED)
+					error = TRUE;
+				else
+					/* move to next char */
+					str++;
+			}
+		}
+		else
+			/* device is not available */
+			error = TRUE;
+	}
+	else
+		/* wrong terminal device number */
+		error = TRUE;
+
+	return (!error);
+}
+
+
+/* This function placess the specified character string in okbuf and
+*	causes the string to be written out to terminal0 */
+void addokbuf(char *strp) {
+	char *tstrp = strp;
+	while ((*mp++ = *strp++) != '\0')
+		;
+	mp--;
+	termprint(tstrp, 0);
+}
+
+
+/* This function placess the specified character string in errbuf and
+*	causes the string to be written out to terminal0.  After this is done
+*	the system shuts down with a panic message */
+void adderrbuf(char *strp) {
+	char *ep = errbuf;
+	char *tstrp = strp;
+
+	while ((*ep++ = *strp++) != '\0');
+
+	termprint(tstrp, 0);
+
+	PANIC();
+}
+
+
 
 void main() {
 	int i;
 
 	initPcbs();
-	printf("Initialized process control blocks   \n");
+	addokbuf("Initialized process control blocks   \n");
 
 	/* Check allocProc */
 	for (i = 0; i < MAXPROC; i++) {
 		if ((procp[i] = allocPcb()) == NULL)
-			printf("allocPcb: unexpected NULL   ");
+			adderrbuf("allocPcb: unexpected NULL   ");
 	}
 	if (allocPcb() != NULL) {
-		printf("allocPcb: allocated more than MAXPROC entries   ");
+		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
-	printf("allocPcb ok   \n");
+	addokbuf("allocPcb ok   \n");
 
 	/* return the last 10 entries back to free list */
 	for (i = 10; i < MAXPROC; i++)
 		freePcb(procp[i]);
-	printf("freed 10 entries   \n");
+	addokbuf("freed 10 entries   \n");
 
 	/* create a 10-element process queue */
 	qa = NULL;
-	if (!emptyProcQ(qa)) printf("emptyProcQ: unexpected FALSE   ");
-	printf("Inserting...   \n");
+	if (!emptyProcQ(qa)) adderrbuf("emptyProcQ: unexpected FALSE   ");
+	addokbuf("Inserting...   \n");
 	for (i = 0; i < 10; i++) {
 		if ((q = allocPcb()) == NULL)
-			printf("allocPcb: unexpected NULL while insert   ");
+			adderrbuf("allocPcb: unexpected NULL while insert   ");
 		switch (i) {
 		case 0:
 			firstproc = q;
@@ -88,86 +166,45 @@ void main() {
 		}
 		insertProcQ(&qa, q);
 	}
-	printf("inserted 10 elements   \n");
+	addokbuf("inserted 10 elements   \n");
 
-	if (emptyProcQ(qa)) printf("emptyProcQ: unexpected TRUE"   );
+	if (emptyProcQ(qa)) adderrbuf("emptyProcQ: unexpected TRUE"   );
 
 	/* Check outProc and headProc */
 	if (headProcQ(qa) != firstproc)
-		printf("headProcQ failed   ");
+		adderrbuf("headProcQ failed   ");
 	q = outProcQ(&qa, firstproc);
 	if (q == NULL || q != firstproc)
-		printf("outProcQ failed on first entry   ");
+		adderrbuf("outProcQ failed on first entry   ");
 	freePcb(q);
 	q = outProcQ(&qa, midproc);
 	if (q == NULL || q != midproc)
-		printf("outProcQ failed on middle entry   ");
+		adderrbuf("outProcQ failed on middle entry   ");
 	freePcb(q);
 	if (outProcQ(&qa, procp[0]) != NULL)
-		printf("outProcQ failed on nonexistent entry   ");
-	printf("outProcQ ok   \n");
+		adderrbuf("outProcQ failed on nonexistent entry   ");
+	addokbuf("outProcQ ok   \n");
 
 	/* Check if removeProc and insertProc remove in the correct order */
-	printf("Removing...   \n");
+	addokbuf("Removing...   \n");
 	for (i = 0; i < 8; i++) {
 		if ((q = removeProcQ(&qa)) == NULL)
-			printf("removeProcQ: unexpected NULL   ");
+			adderrbuf("removeProcQ: unexpected NULL   ");
 		freePcb(q);
 	}
 	if (q != lastproc)
-		printf("removeProcQ: failed on last entry   ");
+		adderrbuf("removeProcQ: failed on last entry   ");
 	if (removeProcQ(&qa) != NULL)
-		printf("removeProcQ: removes too many entries   ");
+		adderrbuf("removeProcQ: removes too many entries   ");
 
         if (!emptyProcQ(qa))
-                printf("emptyProcQ: unexpected FALSE   ");
+                adderrbuf("emptyProcQ: unexpected FALSE   ");
 
-	printf("insertProcQ, removeProcQ and emptyProcQ ok   \n");
-	printf("process queues module ok      \n");
+	addokbuf("insertProcQ, removeProcQ and emptyProcQ ok   \n");
+	addokbuf("process queues module ok      \n");
 
-	printf("checking process trees...\n");
+	addokbuf("headBlocked and outBlocked ok   \n");
+	addokbuf("ASL module ok   \n");
+	addokbuf("So Long and Thanks for All the Fish\n");
 
-	if (!emptyChild(procp[2]))
-	  printf("emptyChild: unexpected FALSE   ");
-
-	/* make procp[1] through procp[9] children of procp[0] */
-	printf("Inserting...   \n");
-	for (i = 1; i < 10; i++) {
-		insertChild(procp[0], procp[i]);
-	}
-	printf("Inserted 9 children   \n");
-
-	if (emptyChild(procp[0]))
-	  printf("emptyChild: unexpected TRUE   ");
-
-	/* Check outChild */
-	q = outChild(procp[1]);
-	if (q == NULL || q != procp[1])
-		printf("outChild failed on first child   ");
-	q = outChild(procp[4]);
-	if (q == NULL || q != procp[4])
-		printf("outChild failed on middle child   ");
-	if (outChild(procp[0]) != NULL)
-		printf("outChild failed on nonexistent child   ");
-	printf("outChild ok   \n");
-
-	/* Check removeChild */
-	printf("Removing...   \n");
-	for (i = 0; i < 7; i++) {
-		if ((q = removeChild(procp[0])) == NULL)
-			printf("removeChild: unexpected NULL   ");
-	}
-	if (removeChild(procp[0]) != NULL)
-	  printf("removeChild: removes too many children   ");
-
-	if (!emptyChild(procp[0]))
-	    printf("emptyChild: unexpected FALSE   ");
-
-	printf("insertChild, removeChild and emptyChild ok   \n");
-	printf("process tree module ok      \n");
-
-	for (i = 0; i < 10; i++)
-		freePcb(procp[i]);
-
-	printf("So Long and Thanks for All the Fish\n");
 }
