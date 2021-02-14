@@ -2,6 +2,7 @@
 
 
 
+pcb_t pcb_table[MAXPROC];
 pcb_t *pcbfree_h = NULL;
 
 
@@ -10,7 +11,6 @@ void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem){
         /*Caso empty*/
         *pcblist_p = pcb_elem;
         pcb_elem->p_next = NULL;
-
         return;
     }
     else if ((*pcblist_p)->p_next == NULL) {
@@ -21,13 +21,16 @@ void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem){
     else insertPCBList(&((*pcblist_p)->p_next), pcb_elem);
 }
 
-void initPcbs(void){
-    static pcb_t pcb_table[MAXPROC]; /*Tabella dei PCB*/
+void initPcbs_rec(int count){
+    if (count>=MAXPROC) /*0...MAXPROC-1*/
+        return;
+    insertPCBList(&pcbfree_h, &pcb_table[count]);
+    count++;
+    initPcbs_rec(count);
+}
 
-    int i = 0;
-    for (i = 0; i < MAXPROC; i++) {
-        insertPCBList(&pcbfree_h, &pcb_table[i]);
-    }
+void initPcbs(void){
+    initPcbs_rec(0);
 }
 
 void freePcb(pcb_t *p) {
@@ -41,8 +44,10 @@ void freePcb(pcb_t *p) {
 }
 
 pcb_t *allocPcb() {
-    if (pcbfree_h == NULL) return NULL;
-    else{
+    if (pcbfree_h == NULL)
+        return NULL;
+    else
+    {
         pcb_t *ptmp = pcbfree_h;
         pcbfree_h = pcbfree_h->p_next;
 

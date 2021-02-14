@@ -126,11 +126,16 @@ void adderrbuf(char *strp) {
 void main() {
 	int i;
 
+	for(i = 0; i < 10; i++)
+		addokbuf("ciao	\n");
+
+	freePcb(procp[i]);
 	initPcbs();
 	addokbuf("Initialized process control blocks   \n");
 
 	/* Check allocProc */
 	for (i = 0; i < MAXPROC; i++) {
+		addokbuf("new entry		\n");
 		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL   ");
 	}
@@ -141,7 +146,9 @@ void main() {
 
 	/* return the last 10 entries back to free list */
 	for (i = 10; i < MAXPROC; i++)
+	{
 		freePcb(procp[i]);
+	}
 	addokbuf("freed 10 entries   \n");
 
 	/* create a 10-element process queue */
