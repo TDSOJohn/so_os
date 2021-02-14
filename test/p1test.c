@@ -127,9 +127,11 @@ void main() {
 	int i;
 
 	for(i = 0; i < 10; i++)
+	{
 		addokbuf("ciao	\n");
+	}
 
-	freePcb(procp[i]);
+	/*freePcb(procp[i]);*/
 	initPcbs();
 	addokbuf("Initialized process control blocks   \n");
 
