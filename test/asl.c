@@ -3,7 +3,7 @@
 
 HIDDEN semd_t *semd_h, *semdFree_h = NULL;
 
-void insertSEMList(semd_t **semList, semd_t *sem_elem){
+HIDDEN void insertSEMList(semd_t **semList, semd_t *sem_elem){
     if(*semList == NULL){
         /*Caso empty*/
         *semList = sem_elem;
@@ -29,14 +29,14 @@ void initASL() {
     return;
 }
 
-int emptySEMList(semd_t **semlist_p){
+HIDDEN int emptySEMList(semd_t **semlist_p){
 	if(*semlist_p == NULL)
 		return 1;
 	else
 		return 0;
 }
 
-semd_t* getSemd_rec(semd_t **semd_h, int* semAdd){
+HIDDEN semd_t* getSemd_rec(semd_t **semd_h, int* semAdd){
 	if(*semd_h == NULL){
 		return NULL; /*Il semaforo non esiste nella ASL*/
 	}
@@ -52,13 +52,13 @@ semd_t* getSemd_rec(semd_t **semd_h, int* semAdd){
 
 
 /*Cerca nella ASL il semaforo con chiave semAdd e restituisce un puntatore ad esso*/
-semd_t* getSemd(int *semAdd){
+HIDDEN semd_t* getSemd(int *semAdd){
 	return getSemd_rec(&semd_h, semAdd);
 }
 
 
 /*Estrae un SEM dalla lista dei semdFree e restituisce un puntatore a esso*/
-semd_t *allocSem(){
+HIDDEN semd_t *allocSem(){
 	if(emptySEMList(&semdFree_h))
 		return NULL;
 	else{
@@ -71,11 +71,9 @@ semd_t *allocSem(){
 		return ptemp;
 	}
 }
-/*Viene inserito il PCB puntato da p nella coda dei processi bloccati associata al SEMD con chiave semAdd.
-Se il semaforo corrispondente non è presente nella ASL, alloca un nuovo SEMD dalla lista di quelli liberi (semdFree) e lo inserisce nella ASL.
-Se non è possibile allocare un nuovo SEMD perchè la lista di quelli liberi è vuota, restituisce TRUE.
-In tutti gli altri casi,restituisce FALSE*/
-int insertBlocked(int *semAdd, pcb_t* p){
+
+
+int insertBlocked(int *semAdd, pcb_t *p){
 		semd_t *semd_target = getSemd(semAdd);
 		if(semd_target == NULL){
 			/*Il semaforo non esiste nella ASL*/
@@ -100,7 +98,7 @@ int insertBlocked(int *semAdd, pcb_t* p){
 
 
 /*Rimuove dalla ASL il semaforo puntato da sem*/
-semd_t *deAllocSem(semd_t **semd_h, semd_t *sem){
+HIDDEN semd_t *deAllocSem(semd_t **semd_h, semd_t *sem){
 	if(*semd_h == sem){
 		semd_t *removed = sem;
 		*semd_h = sem->s_next;

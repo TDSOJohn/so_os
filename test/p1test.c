@@ -259,7 +259,7 @@ void main() {
 		addokbuf("dentro if");
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked(1): unexpected TRUE   ");
-			addokbuf("dentro if");
+		addokbuf("dentro if");
 	}
 	addokbuf("insertBlocked test #2 started  \n");
 	for (i = 0; i < 10; i++) {
