@@ -1,8 +1,8 @@
 #include "../h/asl.h"
 #include "../h/pcb.h"
 
+HIDDEN semd_t *semd_h, *semdFree_h = NULL;
 
-semd_t *semd_h, *semdFree_h;
 
 void insertSEMList(semd_t **semList, semd_t *sem_elem){
     if(*semList == NULL){
@@ -31,26 +31,31 @@ void initASL() {
     return;
 }
 
-semd_t *findSemd(int *semAdd) {
-    semd_t *i = semd_h;
-    semd_t *tmp = NULL;
-    if (semd_h != NULL) {
-        while (i->s_semAdd < semAdd && i->s_next != NULL) {
-            i = i->s_next;
-            if (i->s_semAdd == semAdd) {
-                tmp = i;
-            }
-        }
-    }
-    return tmp;
-}
-
-/*Controlla se la lista di pcb_t* puntata da pcblist_p è vuota*/
 int emptySEMList(semd_t **semlist_p){
     if(*semlist_p == NULL)
         return 1;
     else
         return 0;
+}
+
+semd_t* getSemd_rec(semd_t **semd_h, int* semAdd){
+    if(*semd_h == NULL){
+        return NULL; /*Il semaforo non esiste nella ASL*/
+    }
+
+    if((*semd_h)->s_semAdd == semAdd){
+
+        return *semd_h;
+    }
+
+    else
+        return getSemd_rec(&((*semd_h)->s_next), semAdd);
+}
+
+
+/*Cerca nella ASL il semaforo con chiave semAdd e restituisce un puntatore ad esso*/
+semd_t* getSemd(int *semAdd){
+    return getSemd_rec(&semd_h, semAdd);
 }
 
 
@@ -68,36 +73,83 @@ semd_t *allocSem(){
         return ptemp;
     }
 }
+/*Viene inserito il PCB puntato da p nella coda dei processi bloccati associata al SEMD con chiave semAdd.
+Se il semaforo corrispondente non è presente nella ASL, alloca un nuovo SEMD dalla lista di quelli liberi (semdFree) e lo inserisce nella ASL.
+Se non è possibile allocare un nuovo SEMD perchè la lista di quelli liberi è vuota, restituisce TRUE.
+In tutti gli altri casi,restituisce FALSE*/
+int insertBlocked(int *semAdd, pcb_t* p){
+        semd_t *semd_target = getSemd(semAdd);
+        if(semd_target == NULL){
+            /*Il semaforo non esiste nella ASL*/
+            semd_target = allocSem(); /*semd_target ora punta al SEMD tolto dalla semdFree. Se semdFree è vuota, semd_target == NULL*/
+            if (semd_target == NULL) /*Se la semdFree è vuota restituisco TRUE*/
+                return 1;
+            semd_target->s_semAdd = semAdd;
+            insertSEMList(&semd_h, semd_target); /*Alloco semd_target nella ASL*/
+            p->p_semAdd = semAdd;
+            if(*semAdd <= 0)
+                insertProcQ(&(semd_target->s_procQ), p); /*Inserisco p nella coda di processi bloccati di semd_target*/
+            return 0;
+        }
+        else{
+            /*Il semaforo esiste già nella ASL*/
+            insertProcQ(&(semd_target->s_procQ), p);
+            p->p_semAdd = semAdd;
+            return 0;
+        }
+}
 
-int insertBlocked(int *semAdd,pcb_t *p){
-    semd_t *tmp = findSemd(semAdd);
-    if (tmp == NULL) {
-        tmp = allocSem();
-        if (tmp == NULL) {
-            return 1;
-        }
-        tmp -> s_semAdd = semAdd;
-        insertSEMList(&semd_h, tmp);
-        p->p_semAdd = semAdd;
-        if (*semAdd <= 0) {
-            insertProcQ(&(tmp->s_procQ), p);
-        }
-        return 0;
-    } else {
-        insertProcQ(&(tmp -> s_procQ), p);
-        p->p_semAdd = semAdd;
-        return 0;
+
+
+/*Rimuove dalla ASL il semaforo puntato da sem*/
+semd_t *deAllocSem(semd_t **semd_h, semd_t *sem){
+    if(*semd_h == sem){
+        semd_t *removed = sem;
+        *semd_h = sem->s_next;
+
+        removed->s_semAdd = NULL;
+        removed->s_next = NULL;
+        insertSEMList(&semdFree_h, removed); /*Reinserisce il semaforo nella semdFree*/
+        return removed;
     }
+    else
+        return deAllocSem(&((*semd_h)->s_next), sem);
 }
 
-
-pcb_t* headBlocked(int *semAdd)
-{
-
+/*Ritorna il primo PCB dalla coda dei processi bloccati(s_ProcQ) associata al SEMD della ASL con chiave semAdd.
+Se tale descrittore non esiste nella ASL, restituisce NULL.
+Altrimenti,restituisce l’elemento rimosso.
+Se la coda dei processi bloccati per il semaforo diventa vuota, rimuove il descrittore del semaforo corrispondente dalla ASL e lo inserisce nella coda dei semafori liberi (semdFree).*/
+pcb_t* removeBlocked(int *semAdd){
+    semd_t *semd_target = getSemd(semAdd);
+    if(semd_target){
+        /*Il semaforo è nella ASL*/
+        pcb_t *removed = removeProcQ(&(semd_target->s_procQ)); /*Rimuovo il primo PCB della sua coda di processi*/
+        if (semd_target->s_procQ == NULL)
+            deAllocSem(&semd_h, semd_target);
+        return removed;
+    }
+    else
+    return NULL;
 }
 
-pcb_t*  removeBlocked(int *semAdd)
-{}
+/*Restituisce il puntatore al pcb del primo processo bloccato sul semaforo, senza deaccordarlo.
+Se il semaforo non esiste restituisce NULL.*/
+pcb_t* headBlocked(int *semAdd){
+    semd_t *semd_target = getSemd(semAdd);
 
-pcb_t*  outBlocked(pcb_t *p)
-{}
+    if (semd_target)
+        return headProcQ(semd_target->s_procQ);
+    else
+        return NULL;
+}
+/*Rimuove il pcb puntato da p dalla coda dei processi sul semaforo a lui associato (p->p_semkey) sulla ASL.
+Se il processo non risulta bloccato (cioè è un errore), restituisce NULL, altrimenti restituisce il puntatore al processo*/
+pcb_t* outBlocked(pcb_t *p){
+    semd_t *semd_target = getSemd(p->p_semAdd);
+    pcb_t *blocked = NULL;
+    if(semd_target)
+        blocked = outProcQ(&(semd_target->s_procQ), p);
+    /*Se p non esiste nella coda del semaforo*/
+    return blocked;
+}

@@ -2,7 +2,7 @@
 
 
 
-pcb_t *pcbfree_h = NULL;
+HIDDEN pcb_t *pcbfree_h = NULL;
 
 
 void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem)
