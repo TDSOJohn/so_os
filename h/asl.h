@@ -1,13 +1,15 @@
-#ifndef pcb_h
-#define pcb_h
+#ifndef asl_h
+#define asl_h
 
 #include "pandos_const.h"
 #include "pandos_types.h"
 
 
-void initASL();
+void    initASL();
 
-pcb_t* headBlocked(int *semAdd);
+pcb_t*  headBlocked(int *semAdd);
+int     insertBlocked(int *semAdd, pcb_t *p);
+pcb_t*  removeBlocked(int *semAdd);
+pcb_t*  outBlocked(pcb_t *p);
 
-
-#endif /*pcb_h*/
+#endif /*asl_h*/

@@ -30,7 +30,7 @@ typedef struct pcb_t
 /*	state_t     p_s; */        /* processor state        */
 
 	/* add more fields here */
-    int             *p_semADD;
+    int             *p_semAdd;
 }  pcb_t, *pcb_PTR;
 
 /*  definizione struttura del semaforo */
