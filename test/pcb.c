@@ -2,18 +2,20 @@
 
 
 
-pcb_t pcb_table[MAXPROC];
 pcb_t *pcbfree_h = NULL;
 
 
-void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem){
-    if(*pcblist_p == NULL){
+void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem)
+{
+    if(*pcblist_p == NULL)
+    {
         /*Caso empty*/
         *pcblist_p = pcb_elem;
         pcb_elem->p_next = NULL;
         return;
     }
-    else if ((*pcblist_p)->p_next == NULL) {
+    else if ((*pcblist_p)->p_next == NULL)
+    {
         /*Inserimento*/
         (*pcblist_p)->p_next = pcb_elem;
         pcb_elem->p_next = NULL;
@@ -21,7 +23,10 @@ void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem){
     else insertPCBList(&((*pcblist_p)->p_next), pcb_elem);
 }
 
-void initPcbs_rec(int count){
+void initPcbs_rec(int count)
+{
+    static pcb_t pcb_table[MAXPROC];
+
     if (count>=MAXPROC) /*0...MAXPROC-1*/
         return;
     insertPCBList(&pcbfree_h, &pcb_table[count]);
@@ -29,11 +34,13 @@ void initPcbs_rec(int count){
     initPcbs_rec(count);
 }
 
-void initPcbs(void){
+void initPcbs(void)
+{
     initPcbs_rec(0);
 }
 
-void freePcb(pcb_t *p) {
+void freePcb(pcb_t *p)
+{
     p->p_next = NULL;
     p->p_prev = NULL;
     p->p_child = NULL;
@@ -43,7 +50,8 @@ void freePcb(pcb_t *p) {
     insertPCBList(&pcbfree_h, p);
 }
 
-pcb_t *allocPcb() {
+pcb_t *allocPcb()
+{
     if (pcbfree_h == NULL)
         return NULL;
     else
@@ -62,52 +70,61 @@ pcb_t *allocPcb() {
     }
 }
 
-pcb_t* mkEmptyProcQ(){
+pcb_t* mkEmptyProcQ()
+{
     pcb_t* tmp = NULL;
     return tmp;
 }
 
-int emptyProcQ(pcb_t *tp){
+int emptyProcQ(pcb_t *tp)
+{
     return tp == NULL;
 }
 
-void insertProcQ(pcb_t **tp, pcb_t* p){
-    if ((*tp) == NULL) {
-       (*tp) = p;
-       p->p_next = p->p_prev = p;
-       *tp = p;
-       return;
-   }
-   else {
-       pcb_t *last = (*tp)->p_prev;
+void insertProcQ(pcb_t **tp, pcb_t* p)
+{
+    if ((*tp) == NULL)
+    {
+        (*tp) = p;
+        p->p_next = p->p_prev = p;
+        *tp = p;
+        return;
+    }
+    else
+    {
+        pcb_t *last = (*tp)->p_prev;
 
-       pcb_t *tmp = p;
+        pcb_t *tmp = p;
 
-       tmp->p_next = *tp;
-       tmp->p_prev = last;
+        tmp->p_next = *tp;
+        tmp->p_prev = last;
 
-       last->p_next = (*tp)->p_prev = tmp;
+        last->p_next = (*tp)->p_prev = tmp;
 
-       *tp = tmp;
-   }
+        *tp = tmp;
+    }
 }
 
 pcb_t* removeProcQ(pcb_t **tp)
 {
-    if (*tp == NULL) {
+    if (*tp == NULL)
+    {
         return *tp;
     }
-    else {
+    else
+    {
         /*// Declare two pointers and initialze them*/
         struct pcb_t *curr = *tp, *prev_1 = NULL;
 
         /*// Check if node is the only node in list*/
-        if (curr->p_next == *tp && prev_1 == NULL) {
+        if (curr->p_next == *tp && prev_1 == NULL)
+        {
             (*tp) = NULL;
         }
             /*// If list has more than one node,
             // check if it is the first node*/
-        else {
+        else
+        {
             curr = (*tp)->p_prev;
             prev_1 = (*tp)->p_prev->p_prev;
 
@@ -121,20 +138,24 @@ pcb_t* removeProcQ(pcb_t **tp)
 
 struct pcb_t * deleteNodeOut(struct pcb_t** tp)
 {
-    if (*tp == NULL) {
+    if (*tp == NULL)
+    {
         return *tp;
     }
-    else {
+    else
+    {
         /*// Declare two pointers and initialze them*/
         struct pcb_t *curr = *tp, *prev_1 = NULL;
 
         /*// Check if node is the only node in list*/
-        if (curr->p_next == *tp && prev_1 == NULL) {
+        if (curr->p_next == *tp && prev_1 == NULL)
+        {
             (*tp) = NULL;
         }
             /*// If list has more than one node,
             // check if it is the first node*/
-        else {
+        else
+        {
             prev_1 = (*tp)->p_prev;
 
             /*// Move start ahead*/

@@ -14,7 +14,8 @@ typedef signed int cpu_t;
 typedef unsigned int memaddr;
 
 /* process table entry type */
-typedef struct pcb_t {
+typedef struct pcb_t
+{
 	/* process queue fields */
     struct pcb_t   *p_next;							/* ptr to next entry			*/
     struct pcb_t   *p_prev; 						/* ptr to previous entry		*/
@@ -26,10 +27,19 @@ typedef struct pcb_t {
 					*p_prev_sib;					/* ptr to prev. sibling			*/
 
 	/* process status information */
-/*	state_t     p_s; */             /* processor state        */
+/*	state_t     p_s; */        /* processor state        */
 
 	/* add more fields here */
-
+    int             *p_semADD;
 }  pcb_t, *pcb_PTR;
+
+/*  definizione struttura del semaforo */
+typedef struct semd_t
+{
+	struct semd_t		*s_next; 	/* prossimo elemento della ASL */
+	int 				*s_semAdd; 	/* puntatore al semaforo */
+	pcb_t 				*s_procQ; 	/* puntatore di coda ad una process queue */
+} semd_t;
+
 
 #endif
