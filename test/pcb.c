@@ -22,7 +22,7 @@ void insertPCBList(pcb_t **pcblist_p, pcb_t *pcb_elem)
     else insertPCBList(&((*pcblist_p)->p_next), pcb_elem);
 }
 
-/** Inizializza la pcbFree in modo da contenere tutti gli elementi della pcbFree_table.
+/** Inizializza la pcbFree in modo da contenere tutti gli elementi della pcbFree_table. 
 * Questo metodo deve essere chiamato una volta sola in fase di inizializzazione della struttura dati.
 */
 
@@ -96,7 +96,7 @@ int emptyProcQ(pcb_t *tp)
     return tp == NULL;
 }
 
-/** Inserisce l’elemento puntato da p nella coda dei processi tp.
+/** Inserisce l’elemento puntato da p nella coda dei processi tp. 
 * La doppia indirezione su tp serve per poter inserire p come ultimo elemento della coda.*/
 
 void insertProcQ(pcb_t **tp, pcb_t* p)
@@ -153,7 +153,7 @@ pcb_t* removeProcQ(pcb_t **tp)
     }
 }
 
-/** Rimuove il PCB puntato da p dalla coda dei processi puntata da tp.
+/** Rimuove il PCB puntato da p dalla coda dei processi puntata da tp. 
 * Se p non è presente nella coda, restituisce NULL (p può trovarsi in una posizione arbitraria della coda).
 */
 
@@ -246,9 +246,9 @@ pcb_t* removeChild(pcb_t *p)
 }
 
 
-/** Rimuove il PCB puntato da p dalla lista dei figli del padre.
+/** Rimuove il PCB puntato da p dalla lista dei figli del padre. 
 * Se il PCB puntato da p non ha un padre, restituisce NULL, altrimenti restituisce l’elemento
-* rimosso (cioè p). A differenza della removeChild, p può trovarsi in una posizione arbitraria
+* rimosso (cioè p). A differenza della removeChild, p può trovarsi in una posizione arbitraria 
 * (ossia non è necessariamente il primo figlio del padre). */
 
 pcb_t* outChild(pcb_t *p)

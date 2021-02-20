@@ -2,9 +2,9 @@
  *
  *	Test program for the modules ASL and pcbQueues (phase 1).
  *
- *	Produces progress messages on terminal 0 in addition
+ *	Produces progress messages on terminal 0 in addition 
  *		to the array ``okbuf[]''
- *		Error messages will also appear on terminal 0 in
+ *		Error messages will also appear on terminal 0 in 
  *		addition to the array ``errbuf[]''.
  *
  *		Aborts as soon as an error is detected.
@@ -12,10 +12,10 @@
  *      Modified by Michael Goldweber on May 2020
  */
 
-#include "../h/pandos_const.h"
-#include "../h/pandos_types.h"
+#include "../h/const.h"
+#include "../h/types.h"
 
-#include "/usr/include/umps3/umps/libumps.h"
+#include "/usr/local/include/umps3/umps/libumps.h"
 #include "../h/pcb.h"
 #include "../h/asl.h"
 
@@ -41,12 +41,12 @@ char *mp = okbuf;
 
 typedef unsigned int devreg;
 
-/* This function returns the terminal transmitter status value given its address */
+/* This function returns the terminal transmitter status value given its address */ 
 devreg termstat(memaddr * stataddr) {
 	return((*stataddr) & STATUSMASK);
 }
 
-/* This function prints a string on specified terminal and returns TRUE if
+/* This function prints a string on specified terminal and returns TRUE if 
  * print was successful, FALSE if not   */
 unsigned int termprint(char * str, unsigned int term) {
 	memaddr * statusp;
@@ -54,18 +54,18 @@ unsigned int termprint(char * str, unsigned int term) {
 	devreg stat;
 	devreg cmd;
 	unsigned int error = FALSE;
-
+	
 	if (term < DEVPERINT) {
 		/* terminal is correct */
 		/* compute device register field addresses */
 		statusp = (devreg *) (TERM0ADDR + (term * DEVREGSIZE) + (TRANSTATUS * DEVREGLEN));
 		commandp = (devreg *) (TERM0ADDR + (term * DEVREGSIZE) + (TRANCOMMAND * DEVREGLEN));
-
+		
 		/* test device status */
 		stat = termstat(statusp);
 		if (stat == READY || stat == TRANSMITTED) {
 			/* device is available */
-
+			
 			/* print cycle */
 			while (*str != EOS && !error) {
 				cmd = (*str << CHAROFFSET) | PRINTCHR;
@@ -75,14 +75,14 @@ unsigned int termprint(char * str, unsigned int term) {
 				stat = termstat(statusp);
 				while (stat == BUSY)
 					 stat = termstat(statusp);
-
+				
 				/* end of wait */
 				if (stat != TRANSMITTED)
 					error = TRUE;
 				else
 					/* move to next char */
 					str++;
-			}
+			} 
 		}
 		else
 			/* device is not available */
@@ -92,7 +92,7 @@ unsigned int termprint(char * str, unsigned int term) {
 		/* wrong terminal device number */
 		error = TRUE;
 
-	return (!error);
+	return (!error);		
 }
 
 
@@ -113,11 +113,11 @@ void addokbuf(char *strp) {
 void adderrbuf(char *strp) {
 	char *ep = errbuf;
 	char *tstrp = strp;
-
+	
 	while ((*ep++ = *strp++) != '\0');
-
+	
 	termprint(tstrp, 0);
-
+		
 	PANIC();
 }
 
@@ -207,7 +207,7 @@ void main() {
 
 	if (!emptyChild(procp[2]))
 	  adderrbuf("emptyChild: unexpected FALSE   ");
-
+	
 	/* make procp[1] through procp[9] children of procp[0] */
 	addokbuf("Inserting...   \n");
 	for (i = 1; i < 10; i++) {
@@ -240,11 +240,11 @@ void main() {
 
 	if (!emptyChild(procp[0]))
 	    adderrbuf("emptyChild: unexpected FALSE   ");
-
+	    
 	addokbuf("insertChild, removeChild and emptyChild ok   \n");
 	addokbuf("process tree module ok      \n");
 
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 10; i++) 
 		freePcb(procp[i]);
 
 
@@ -256,10 +256,8 @@ void main() {
 	addokbuf("insertBlocked test #1 started  \n");
 	for (i = 10; i < MAXPROC; i++) {
 		procp[i] = allocPcb();
-		addokbuf("dentro if");
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked(1): unexpected TRUE   ");
-		addokbuf("dentro if");
 	}
 	addokbuf("insertBlocked test #2 started  \n");
 	for (i = 0; i < 10; i++) {
@@ -275,7 +273,7 @@ void main() {
 
 	if (insertBlocked(&onesem, procp[9]) == FALSE)
 		adderrbuf("insertBlocked: inserted more than MAXPROC   ");
-
+	
 	addokbuf("removeBlocked test started   \n");
 	for (i = 10; i< MAXPROC; i++) {
 		q = removeBlocked(&sem[i]);
@@ -317,3 +315,4 @@ void main() {
 	addokbuf("So Long and Thanks for All the Fish\n");
 
 }
+

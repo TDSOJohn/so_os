@@ -3,7 +3,7 @@
 
 HIDDEN semd_t *semd_h, *semdFree_h = NULL;
 
-/**  Cerca il semaforo e lo restituisce.
+/**  Cerca il semaforo e lo restituisce. 
 *    Se non lo trova restituisce NULL
 */
 
@@ -91,8 +91,8 @@ int allocFree(int *semAdd, pcb_t *p){
 
 /** Viene inserito il PCB puntato da p nella coda dei processi bloccati associata al SEMD con chiave
 *semAdd. Se il semaforo corrispondente non e' presente nella ASL, alloca un nuovo SEMD dalla
-*lista di quelli liberi (semdFree) e lo inserisce nella ASL, settando I campi in maniera opportuna (i.e.key e s_procQ).
-*Se non e' possibile allocare un nuovo SEMD perché la lista di quelli liberi e' vuota, restituisce TRUE.
+*lista di quelli liberi (semdFree) e lo inserisce nella ASL, settando I campi in maniera opportuna (i.e.key e s_procQ). 
+*Se non e' possibile allocare un nuovo SEMD perché la lista di quelli liberi e' vuota, restituisce TRUE. 
 *In tutti gli altri casi, restituisce
 *FALSE.
 */
@@ -116,7 +116,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
 * ASL con chiave semAdd. Se tale descrittore non esiste nella ASL, restituisce NULL.
 * Altrimenti, restituisce l’elemento rimosso. Se la coda dei processi bloccati per il semaforo
 * diventa vuota, rimuove il descrittore corrispondente dalla ASL e lo inserisce nella
-* coda dei descrittori liberi (semdFree_h).
+* coda dei descrittori liberi (semdFree_h). 
 */
 
 
@@ -134,7 +134,7 @@ pcb_t *removeBlocked(int *semAdd){
 }
 
 
-/** Rimuove il PCB puntato da p dalla coda del semaforo su cui è bloccato (indicato da p- >p_semAdd).
+/** Rimuove il PCB puntato da p dalla coda del semaforo su cui è bloccato (indicato da p- >p_semAdd). 
 * Se il PCB non compare in tale coda, allora restituisce NULL (condizione di errore).
 * Altrimenti, restituisce p.*/
 
@@ -165,7 +165,7 @@ pcb_t *headBlocked(int *semAdd){
     return result;
 }
 
-/** Inizializza la lista dei semdFree in modo da contenere tutti gli elementi della semdTable.
+/** Inizializza la lista dei semdFree in modo da contenere tutti gli elementi della semdTable. 
 * Questo metodo viene invocato una volta sola durante l’inizializzazione della struttura dati. */
 
 void initASL(){
