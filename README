@@ -2,8 +2,8 @@ This directory contains the following supporting files for use in the Pandos Pro
 
 General Purpose Files:
 -------------------------
-const.h: Header file contains utility constants & macro definitions
-types.h: Header file contains utility types definitions
+pandos_const.h: Header file contains utility constants & macro definitions
+pandos_types.h: Header file contains utility types definitions
 
 
 Pandos Phase 1 files:

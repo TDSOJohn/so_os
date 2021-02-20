@@ -39,7 +39,7 @@ typedef struct semd_t
 	struct semd_t		*s_next; 	/* prossimo elemento della ASL */
 	int 				*s_semAdd; 	/* puntatore al semaforo */
 	pcb_t 				*s_procQ; 	/* puntatore di coda ad una process queue */
-} semd_t;
+} semd_t, *semd_PTR;
 
 
 #endif
