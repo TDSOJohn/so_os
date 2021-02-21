@@ -1,7 +1,7 @@
 PandOS is the most recent of a series of educational operating systems created by Michael Goldweber and Renzo Davoli.
 It runs on [uMPS3](https://github.com/virtualsquare/umps3), based around the MIPS R2/3000 microprocessor.
 
-##Structure
+Structure
 -------------------------
 Inspired by the T.H.E. system outlined by Dijkstra in 1968, the OS is divided in a number of layers. Each layer *i* is an abstract machine to the layer *i+1*.
 
@@ -38,10 +38,10 @@ Pandos Phase 3 files:
 Phase3Makefile: sample makefile for use in Phase 3 (rename as Makefile)
 testPrograms subdirectory - which contains its own README file.
 
-##Usage
+Usage
 -------------------------
 Compile command (use -d flag for additional debugging output):
 
 ```bash
-make --file=test/Phase1Makefile
+make -C phase1 --file=Phase1Makefile
 ```
