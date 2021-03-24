@@ -8,7 +8,7 @@
 ifneq ($(wildcard /usr/bin/umps3),)
 	UMPS3_DIR_PREFIX = /usr
 	LIBDIR = $(UMPS3_DIR_PREFIX)/lib/x86_64-linux-gnu/umps3
-	
+
 else
 	UMPS3_DIR_PREFIX = /usr/local
 	LIBDIR = $(UMPS3_DIR_PREFIX)/lib/umps3
@@ -18,9 +18,14 @@ INCDIR = $(UMPS3_DIR_PREFIX)/include/umps3/umps
 SUPDIR = $(UMPS3_DIR_PREFIX)/share/umps3
 #LIBDIR = $(UMPS3_DIR_PREFIX)/lib/umps3
 
-DEFS = ../h/const.h ../h/types.h ../h/pcb.h ../h/asl.h \
-	../h/initial.h ../h/interrupts.h ../h/scheduler.h ../h/exceptions.h \
+DEFS = pandos_const.h pandos_types.h pcb.h asl.h \
+	initial.h interrupts.h scheduler.h exceptions.h \
 	$(INCDIR)/libumps.h Makefile
+
+IDIR = ../include
+ODIR = ../src
+
+DEPS = $($(IDIR)/%DEFS)
 
 OBJS = initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o
 
@@ -37,7 +42,7 @@ AS = mipsel-linux-gnu-as -KPIC
 EF = umps3-elf2umps
 
 #main target
-all: kernel.core.umps 
+all: kernel.core.umps
 
 kernel.core.umps: kernel
 	$(EF) -k kernel
@@ -46,7 +51,7 @@ kernel: p2test.o $(OBJS)
 	$(LD) $(LDCOREFLAGS) $(LIBDIR)/crtso.o p2test.o $(OBJS) $(LIBDIR)/libumps.o -o kernel
 
 
-%.o: %.c $(DEFS)
+%.o: $(ODIR)/%.c $(DEPS)
 	$(CC) $(CFLAGS) $<
 
 
