@@ -1,0 +1,59 @@
+{
+    "boot": {
+        "core-file": "/home/bruno/Documents/cela/phase2/kernel.core.umps",
+        "load-core-file": true
+    },
+    "bootstrap-rom": "/usr/share/umps3/coreboot.rom.umps",
+    "clock-rate": 1,
+    "devices": {
+        "disk0": {
+            "enabled": true,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/strConcat.c"
+        },
+        "disk1": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/terminalTest2.c"
+        },
+        "disk2": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/terminalTest3.c"
+        },
+        "disk3": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/terminalTest4.c"
+        },
+        "disk4": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/terminalTest5.c"
+        },
+        "disk5": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/fibEight.c"
+        },
+        "disk6": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/printerTest.c"
+        },
+        "disk7": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/daDavoli/resources/testers/fibEleven.c"
+        },
+        "flash0": {
+            "enabled": false,
+            "file": "/home/bruno/Documents/cela/phase3/phase3Config"
+        },
+        "terminal0": {
+            "enabled": true,
+            "file": "term0.umps"
+        }
+    },
+    "execution-rom": "/usr/share/umps3/exec.rom.umps",
+    "num-processors": 1,
+    "num-ram-frames": 64,
+    "symbol-table": {
+        "asid": 64,
+        "file": "/home/bruno/Documents/cela/phase2/kernel.stab.umps"
+    },
+    "tlb-floor-address": "0x40000000",
+    "tlb-size": 16
+}

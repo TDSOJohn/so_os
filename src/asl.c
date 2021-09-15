@@ -140,17 +140,18 @@ pcb_t *removeBlocked(int *semAdd){
 
 
 pcb_t *outBlocked(pcb_t *p){
-    pcb_t *result = NULL;
-    semd_t *i = findSemd(p->p_semAdd);
-    if(i != NULL){
-		result = outProcQ(&(i->s_procQ), p);
-		/* Se la sua coda diventa vuota */
-		if(emptyProcQ(i ->s_procQ)){
-			freeSemd(i);
-		}
+
+	pcb_t *result = NULL;
+	semd_t *i = findSemd(p->p_semAdd);
+	if(i != NULL){
+	result = outProcQ(&(i->s_procQ), p);
+	/* Se la sua coda diventa vuota */
+	if(emptyProcQ(i ->s_procQ)){
+		freeSemd(i);
 	}
-    return result;
 }
+	return result;
+		}
 
 /** Restituisce (senza rimuovere) il puntatore al PCB che si trova in testa alla coda dei processi
 * associata al SEMD con chiave semAdd. Ritorna NULL se il SEMD non compare nella ASL oppure

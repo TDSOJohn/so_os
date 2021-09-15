@@ -29,7 +29,7 @@ DEPS = $($(IDIR)/%DEFS)
 
 OBJS = initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o
 
-CFLAGS = -ffreestanding -ansi -Wall -c -mips1 -mabi=32 -mfp32 -mno-gpopt -G 0 -fno-pic -mno-abicalls
+CFLAGS = -ffreestanding -std=c11 -ansi -Wall -c -mips1 -mabi=32 -mfp32 -mno-gpopt -G 0 -fno-pic -mno-abicalls
 
 LDAOUTFLAGS = -G 0 -nostdlib -T $(SUPDIR)/umpsaout.ldscript
 LDCOREFLAGS =  -G 0 -nostdlib -T $(SUPDIR)/umpscore.ldscript

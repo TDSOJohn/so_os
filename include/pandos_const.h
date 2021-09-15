@@ -61,6 +61,7 @@
 
 
 /* Status register constants */
+#define KUPON       0x
 #define ALLOFF      0x00000000
 #define USERPON     0x00000008
 #define IEPON       0x00000004
@@ -91,6 +92,7 @@
 #define DIRTYON  0x00000400
 #define VALIDON  0x00000200
 #define GLOBALON 0x00000100
+#define VALIDOFF 
 
 
 /* EntryHI register constants */
@@ -152,9 +154,6 @@
 #define STATESIZE  0x8C
 #define DEVICECNT  (DEVINTNUM * DEVPERINT)
 #define MAXSTRLENG 128
-
-#define DELAYASID    (UPROCMAX + 1)
-#define KUSEG3SECTNO 0
 
 #define VMDISK        0
 #define MAXPAGES      32

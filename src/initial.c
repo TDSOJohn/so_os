@@ -1,64 +1,53 @@
-#include "../h/const.h"
-#include "../h/types.h"
-/*#include "/usr/local/include/umps3/umps/libumps.e"*/
+#include "../include/initial.h"
 
 int processCount;
 int softBlockCount;
-pcb_t *readyQueue;
-pcb_t *currentProcess;
+pcb_t* readyQueue;
+pcb_t* currentProcess;
+int deviceSem[49];
 
-/*Semafori*/
-
-int semDisk[8];
-int semTape[8];
-int semEthernet[8];
-int semPrinter[8];
-int semTerminalRead[8];
-int semTerminalWrite[8];
-int pseudoClock;
-passupvector_t* passupvector;
-
-void uTLB_RefillHandler() {
-	setENTRYHI(0x80000000);
-	setENTRYLO(0x00000000);
-	TLBWR();
-	LDST ((state_PTR) 0x0FFFF000);
-}
-
-void funzioneBella()
-{
-
-}
+extern void test();
+extern void uTLB_RefillHandler();
+extern void exceptionHandler();
 
 int main () {
-	initPcbs();
-	initSemd();
 
-	*((memaddr*) 0x0FFFF900) = (memaddr) uTLB_RefillHandler;
-	*((memaddr*) 0x0FFFF900 + 0x04) = (memaddr) 0x2000.1000;
-	*((memaddr*) 0x0FFFF900 + 0x08) = (memaddr) funzioneBella;
+  passupvector_t *pUV = (passupvector_t*) 0x0FFFF900;
+  pUV->tlb_refill_handler = (memaddr ) uTLB_RefillHandler;
+  pUV->tlb_refill_stackPtr = 0x20001000;
+  pUV->exception_handler = (memaddr) exceptionHandler;
+  pUV->exception_stackPtr = 0x20001000;
 
-	*((memaddr*) 0x0FFFF900 + 0x0C) = (memaddr) 0x2000.1000;
+  initPcbs();
+  initASL();
+
+  processCount = 0;
+  softBlockCount = 0;
+  readyQueue = mkEmptyProcQ();
+  currentProcess = NULL;
 
 
+  int i;
+  
+  for (i = 0; i < 49; i++) {
+    deviceSem[i] = 0;
 
-	processCount = 0;
-	softBlockCount = 0;
-	readyQueue = mkEmptyProcQ();
-	currentProcess = NULL;
+  }
 
-	for(i=0;i<8;i++){
-		semDisk[i] = 0;
-		semTape[i] = 0;
-		semEthernet[i] = 0;
-		semPrinter[i] = 0;
-		semTerminalRead[i] = 0;
-		semTerminalWrite[i] = 0;
-	}
-	pseudoClock = 0;
+  LDIT(100*1000);
+  pcb_t *p = allocPcb();
+  unsigned int status = 0;
+  status = status | IEPON | IMON | TEBITON;
+  p->p_s.status = status;
+  RAMTOP(p->p_s.reg_sp);
+  p->p_s.pc_epc = (memaddr) test;
+  p->p_s.reg_t9 = (memaddr) test;
+  p->p_time = 0;
+  p->p_semAdd = NULL;
+  p->p_supportStruct = NULL;
+  insertProcQ(&(readyQueue), p);
+  processCount = processCount + 1;
+  scheduler();
 
-	init();
-
-	PANIC();
-	return -1;
+  return -1;
 }

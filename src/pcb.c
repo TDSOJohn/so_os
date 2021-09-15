@@ -69,6 +69,10 @@ pcb_t *allocPcb()
         ptmp->p_prnt = NULL;
         ptmp->p_next_sib = NULL;
         ptmp->p_prev_sib = NULL;
+        ptmp->p_semAdd = NULL;
+        ptmp->p_time = 0;
+
+
 
         return ptmp;
     }
@@ -159,29 +163,43 @@ pcb_t* removeProcQ(pcb_t **tp)
 
 pcb_t* outProcQ(pcb_t **tp, pcb_t* p)
 {
-    pcb_t *iterator = (*tp);
-    pcb_t *removed = NULL;
-    if(p != NULL && !emptyProcQ((*tp)))
-    {
-	while(iterator -> p_next != p && iterator -> p_next != (*tp))
-        {
-	/* Scorro in avanti */
-	iterator = iterator -> p_next;
-	}
-	if( iterator -> p_next == p )
-       {
-	removed = iterator -> p_next;
-        /* Se la coda ha un solo elemento */
-	if(iterator -> p_next == iterator)
-	{
-	*(tp) = NULL;
-	} else {
-		iterator -> p_next = removed -> p_next;
-		removed -> p_next -> p_prev = iterator;
-			}
-		}
-	}
-    return removed;
+  pcb_t* ret;
+  pcb_t* temp;
+if(((*tp) == NULL) || (p == NULL)) {
+  return NULL;
+}
+/* only one thing in queue and it is what we want */
+if((*tp) == p){
+
+  if ((((*tp) -> p_next) == (*tp))) {
+    ret = (*tp);
+    (*tp) = mkEmptyProcQ();
+    return ret;
+  } else {
+    (*tp)->p_prev->p_next = (*tp)->p_next;
+    (*tp)->p_next->p_prev = (*tp)->p_prev;
+    *tp = (*tp)->p_prev;
+  }
+  return p;
+} else {
+/* node is somewhere else, start at p_next */
+temp = (*tp) -> p_next;
+while(temp != (*tp)) {
+  /* found node ? */
+  if(temp == p){
+    /* unleave node and return it */
+    ret = temp;
+    ret -> p_prev -> p_next = ret -> p_next;
+    ret -> p_next -> p_prev = ret -> p_prev;
+    ret -> p_next = NULL;
+    ret -> p_prev = NULL;
+    return ret;
+  }
+    temp = temp -> p_next;
+  }
+  /* node not in list here */
+  return NULL;
+}
 }
 
 
